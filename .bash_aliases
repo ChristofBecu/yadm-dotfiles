@@ -1,0 +1,8 @@
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias dotfiles='/usr/bin/git --git-dir=/home/bedawang/.dotfiles/ --work-tree=/home/bedawang'
+alias cat='bat'
+alias ls='eza --icons'
+alias lsa='eza -lha -G --icons'
+alias neofetch='fastfetch'
+alias cd='z'
