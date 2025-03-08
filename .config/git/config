@@ -7,3 +7,37 @@
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/usr/bin/gh auth git-credential
+[column]
+	ui = auto
+[branch]
+	sort = committerdate
+[tag]
+	sort = version:refname
+[init]
+	defaultBranch = master
+[diff]
+	algorithm = histogram
+	colorMoved = plain
+	mnemonicPrefix = true
+	renames = true
+[push]
+	default = simple
+	autoSetupRemote = true
+	followTags = true
+[fetch]
+	prune = true
+	pruneTags = true
+	all = true
+[help]
+	autocorrect = true
+[commit]
+	verbose = true
+[rerere]
+	enabled = true
+[core]
+	excludesFile = ~/.gitignore
+[merge]
+	conflictstyle = zdiff3
+[pull]
+	rebase = true
+
