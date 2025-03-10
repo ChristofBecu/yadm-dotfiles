@@ -4,11 +4,3 @@ if status is-interactive
 	    exec startx
 	end
 end
-
-
-set -x PATH $PATH /home/bedawang/.cargo/bin
-
-zoxide init fish | source
-
-source ~/.config/fish/bash_aliases.fish
-
