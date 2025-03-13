@@ -7,18 +7,20 @@ function fish_right_prompt
     function __show_git_status
         set -l repo_name $argv[1]
         set -l git_cmd $argv[2]
+        
 
-        set -l git_dir ($git_cmd rev-parse --git-dir 2>/dev/null)
+        set -l git_dir (eval $git_cmd rev-parse --git-dir 2>/dev/null)
+
         if test -z "$git_dir"
             return
         end
 
-        set -l branch ($git_cmd symbolic-ref --short HEAD 2>/dev/null)
-        set -l commit ($git_cmd rev-parse HEAD 2>/dev/null | string sub -l 7)
+        set -l branch (eval $git_cmd symbolic-ref --short HEAD 2>/dev/null)
+        set -l commit (eval $git_cmd rev-parse HEAD 2>/dev/null | string sub -l 7)
         set -l action (fish_print_git_action "$git_dir")
 
         # Get the commit difference counts between local and remote.
-        $git_cmd rev-list --count --left-right 'HEAD...@{upstream}' 2>/dev/null |
+        eval $git_cmd rev-list --count --left-right 'HEAD...@{upstream}' 2>/dev/null |
             read -d \t -l status_ahead status_behind
         if test $status -ne 0
             set status_ahead 0
@@ -32,7 +34,7 @@ function fish_right_prompt
         end
 
         # Get working directory status
-        set -l porcelain_status ($git_cmd status --porcelain 2>/dev/null | string sub -l2)
+        set -l porcelain_status (eval $git_cmd status --porcelain 2>/dev/null | string sub -l2)
 
         set -l status_added 0
         if string match -qr '[ACDMT][ MT]|[ACMT]D' $porcelain_status
@@ -59,7 +61,12 @@ function fish_right_prompt
             set status_untracked 1
         end
 
-        set_color -o
+        if test "$repo_name" = "git (root)"
+            set_color --background=red white
+        else
+            set_color -o
+        end
+
         echo -n " ($repo_name)"
         if test -n "$branch"
             set_color green
@@ -99,17 +106,21 @@ function fish_right_prompt
         if test $status_untracked -ne 0
             echo -n ' '(set_color white)'◼'
         end
+
+        set_color normal
     end
 
     set -l current_dir (pwd)
 
-    # If in home directory, show YADM status
     if test "$current_dir" = "$HOME"
         if command -sq yadm
             __show_git_status "yadm" "yadm"
         end
+    else if test "$current_dir" = "/etc"
+        if command -sq sudo
+            __show_git_status "git (root)" "sudo git"
+        end
     else
-        # Otherwise, show normal Git status
         if command -sq git
             __show_git_status "git" "git"
         end
