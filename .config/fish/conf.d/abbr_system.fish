@@ -1,0 +1,5 @@
+abbr suspend "systemctl suspend"
+abbr reboot "systemctl reboot"
+abbr poweroff "systemctl poweroff"
+abbr shutdown "systemctl shutdown"
+abbr logout "loginctl terminate-session $XDG_SESSION_ID"
