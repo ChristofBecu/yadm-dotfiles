@@ -1,0 +1,13 @@
+[Unit]
+Description=Arch Linux System Update Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /home/bedawang/scripts/system_update.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=default.target
+

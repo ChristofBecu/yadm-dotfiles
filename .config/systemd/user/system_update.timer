@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Arch Linux System Update Weekly
+
+[Timer]
+OnCalendar=*-*-* 12:31:00
+Persistent=true
+RandomizedDelaySec=1second
+
+[Install]
+WantedBy=timers.target
+
