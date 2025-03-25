@@ -1,4 +1,6 @@
 .dotfiles
+.api_keys
+logs/
 Documents/
 Downloads/
 dev/
