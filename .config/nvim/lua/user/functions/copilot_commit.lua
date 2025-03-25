@@ -56,6 +56,16 @@ local function insert_copilot_commit()
         print("No insertion point found in COMMIT_EDITMSG. Appending commit message at the end.")
         vim.api.nvim_buf_set_lines(commit_editmsg_buf, -1, -1, false, commit_message)
     end
+
+    -- Close the Copilot Chat window if succesfull
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.api.nvim_buf_get_name(buf):match("CopilotChat") then
+            vim.api.nvim_win_close(win, true)
+            print("Copilot Chat window closed.")
+            break
+        end
+    end
 end
 
 vim.keymap.set("n", "<leader>c", insert_copilot_commit, { desc = "Insert Copilot commit message" })
