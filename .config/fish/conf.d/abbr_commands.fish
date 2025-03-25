@@ -13,6 +13,8 @@ abbr -a lsa 'eza -lha -G --icons'
 
 abbr -a neofetch 'fastfetch'
 
+abbr -a ai 'ai.sh'
+
 alias pkgInfo="pacman -Qq | fzf --preview 'pacman -Qil {} | 
 bat -fpl yml' --layout=reverse --bind 'enter:execute(pacman -Qil 
 {} | less)'"
