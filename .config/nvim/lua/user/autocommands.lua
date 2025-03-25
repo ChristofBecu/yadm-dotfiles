@@ -1,0 +1,1 @@
+require("user.autocommands.commit_editmsg_copilotchatcommit")
