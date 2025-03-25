@@ -5,6 +5,7 @@ local function insert_copilot_commit()
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     local commit_message = {}
     local capture = false
+    local succesfull = false
 
     -- Extract the commit message from the Copilot buffer
     for _, line in ipairs(lines) do
@@ -52,19 +53,29 @@ local function insert_copilot_commit()
     if insert_index > 0 then
         vim.api.nvim_buf_set_lines(commit_editmsg_buf, insert_index, insert_index, false, commit_message)
         print("Commit message inserted into COMMIT_EDITMSG.")
+        succesfull = true
     else
         print("No insertion point found in COMMIT_EDITMSG. Appending commit message at the end.")
         vim.api.nvim_buf_set_lines(commit_editmsg_buf, -1, -1, false, commit_message)
     end
 
     -- Close the Copilot Chat window if succesfull
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
-        local buf = vim.api.nvim_win_get_buf(win)
-        if vim.api.nvim_buf_get_name(buf):match("CopilotChat") then
-            vim.api.nvim_win_close(win, true)
-            print("Copilot Chat window closed.")
-            break
+    if succesfull then
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            local bufname = vim.api.nvim_buf_get_name(buf)
+            local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
+            -- Adjust the condition based on how CopilotChat identifies itself
+            if bufname:match("CopilotChat") or filetype == "copilot-chat" then
+                vim.api.nvim_win_close(win, true) -- Force close
+                print("Copilot Chat window closed.")
+            end
         end
+        -- Save and close the COMMIT_EDITMSG buffer
+        vim.api.nvim_buf_call(commit_editmsg_buf, function()
+            vim.cmd("wq")
+        end)
+        print("COMMIT_EDITMSG buffer saved and closed.")
     end
 end
 
