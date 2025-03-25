@@ -6,12 +6,6 @@ local function insert_copilot_commit()
     local commit_message = {}
     local capture = false
 
-    -- Debugging: Print all lines in the current buffer
-    print("Buffer content:")
-    for i, line in ipairs(lines) do
-        print(i, line)
-    end
-
     -- Extract the commit message from the Copilot buffer
     for _, line in ipairs(lines) do
         if line:match("^```gitcommit") then
@@ -48,7 +42,6 @@ local function insert_copilot_commit()
     -- Find the insertion point in the COMMIT_EDITMSG buffer
     local insert_index = 0
     for i, line in ipairs(editmsg_lines) do
-        print("Checking line in COMMIT_EDITMSG:", line) -- Debugging
         if line:match("# ------------------------ >8 ------------------------") then
             insert_index = i - 1
             break
