@@ -1,3 +1,5 @@
 require("user.remap")
 require("user.lazy_init")
 require("user.set")
+require("user.functions")
+-- require("user.copilot_commit")
