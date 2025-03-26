@@ -5,4 +5,5 @@ if status is-interactive
             exec startx
         end
 	end
+
 end
