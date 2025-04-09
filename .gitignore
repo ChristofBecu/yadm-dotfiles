@@ -65,3 +65,6 @@ vimbegood.lua
 .config/scummvm/
 .npm/
 .python_history
+.config/nomacs/*
+".config/nomacs/Image Lounge.conf"
+.config/nomacs/Image\ Lounge.conf
