@@ -21,3 +21,4 @@ eval "$(zoxide init bash)"
 
 source ~/sources/forgit/forgit.plugin.sh
 
+. "$HOME/.cargo/env"

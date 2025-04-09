@@ -10,3 +10,4 @@ if [ "$(tty)" == "/dev/tty1" ]; then
 	fi
 fi
 
+. "$HOME/.cargo/env"
