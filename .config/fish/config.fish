@@ -7,3 +7,5 @@ if status is-interactive
 	end
 
 end
+
+thefuck --alias | source
