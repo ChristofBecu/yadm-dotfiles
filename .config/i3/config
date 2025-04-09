@@ -100,6 +100,13 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
+# Launch Zen-Browser on workspace 1 on display eDP-1
+bindsym $mod+z exec --no-startup-id zen-browser
+#exec --no-startup-id i3-msg "$ws1; move window to output eDP-1; exec zen-browser"
+exec --no-startup-id i3-msg "$ws1; move window to output eDP-1; exec zen-browser"
+
+
+
 # resize window (you can also use the mouse for that)
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
@@ -169,3 +176,5 @@ bindsym $mod+Shift+M bar mode dock
 
 # Start polybar launcher
 # exec_always --no-startup-id /home/$USER/.config/polybar/launch.sh
+
+exec --no-startup-id feh --bg-scale /home/bedawang/gandalf-computer-wizzard.jpg
