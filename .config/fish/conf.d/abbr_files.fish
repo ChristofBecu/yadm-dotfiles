@@ -1,5 +1,6 @@
 # do not delete / or prompt if deleting more than 3 files at a time
 abbr -a rm 'rm -I --preserve-root'
+abbr -a rmd 'rm -I --preserve-root' -rf 
 
 # confirmation
 abbr -a mv 'mv -i'
