@@ -1,3 +1,5 @@
 export PATH="$HOME/.cargo/bin:$PATH"
 
 export PATH="$HOME/.dotnet:$PATH
+
+export PATH=$PATH:~/.local/share/nvm/v22.14.0/lib/node_modules/@angular/cli/bin
