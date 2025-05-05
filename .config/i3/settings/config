@@ -1,5 +1,4 @@
 include "./volume-control.conf"
-
 include "./bar.conf"
-
 include "./background.conf"
+include "./gaps.conf"
