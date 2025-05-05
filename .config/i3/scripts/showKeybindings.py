@@ -13,7 +13,42 @@ class KeybindingParser:
         self.config_dir = Path(config_dir)
         self.keybindings = defaultdict(list)
         self.categories = {}
-
+        self.mod_key = "unknown"  # Default value if we can't find the definition
+        
+    def find_mod_key(self):
+        """Find the $mod key definition in the config files."""
+        # Check main config file first
+        config_file = self.config_dir.parent / "config"
+        if not config_file.exists():
+            return "unknown"
+            
+        try:
+            with open(config_file, 'r') as f:
+                content = f.read()
+                
+            # Look for the mod key definition
+            mod_pattern = re.compile(r'set\s+\$mod\s+(Mod[1-5]|mod[1-5])', re.IGNORECASE)
+            match = mod_pattern.search(content)
+            
+            if match:
+                mod_key = match.group(1)
+                # Map Mod4 to a user-friendly name
+                mod_mappings = {
+                    'mod1': 'Alt',
+                    'mod4': 'Super (Windows key)',
+                    'mod5': 'AltGr'
+                }
+                
+                # Convert to lowercase for comparison
+                mod_key_lower = mod_key.lower()
+                if mod_key_lower in mod_mappings:
+                    return f"{mod_key} ({mod_mappings[mod_key_lower]})"
+                return mod_key
+        except Exception as e:
+            print(f"Error reading config file: {e}", file=sys.stderr)
+            
+        return "unknown"
+    
     def parse_file(self, file_path, category=None):
         """Parse a single config file for keybindings."""
         print(f"Parsing: {file_path}", file=sys.stderr)
@@ -79,6 +114,9 @@ class KeybindingParser:
 
     def parse_config(self):
         """Parse the main config and all included files."""
+        # Find the mod key first
+        self.mod_key = self.find_mod_key()
+        
         main_config = self.config_dir / "keybindings.conf"
         
         # Fallback to config if keybindings.conf doesn't exist
@@ -120,9 +158,10 @@ class KeybindingParser:
 
 
 class KeybindingsGUI:
-    def __init__(self, root, keybindings):
+    def __init__(self, root, keybindings, mod_key):
         self.root = root
         self.keybindings = keybindings
+        self.mod_key = mod_key
         self.all_bindings = []
         self.setup_ui()
         self.populate_data()
@@ -217,8 +256,8 @@ class KeybindingsGUI:
         # Update category combobox
         self.category_combo['values'] = sorted(categories)
         
-        # Update status with count
-        self.status_var.set(f"Found {len(self.all_bindings)} keybindings. NOTE: 'Mod' refers to your configured modifier key.")
+        # Update status with count and mod key info
+        self.status_var.set(f"Found {len(self.all_bindings)} keybindings. NOTE: 'Mod' refers to {self.mod_key}")
     
     def filter_bindings(self, event=None):
         # Clear the current treeview
@@ -253,7 +292,7 @@ class KeybindingsGUI:
             self.status_var.set("No keybindings match your filter.")
         else:
             plural = "s" if count != 1 else ""
-            self.status_var.set(f"Showing {count} keybinding{plural}. NOTE: 'Mod' refers to your configured modifier key.")
+            self.status_var.set(f"Showing {count} keybinding{plural}. NOTE: 'Mod' refers to {self.mod_key}")
 
 
 if __name__ == "__main__":
@@ -266,10 +305,12 @@ if __name__ == "__main__":
     if use_gui:
         try:
             root = tk.Tk()
-            app = KeybindingsGUI(root, parser.keybindings)
+            app = KeybindingsGUI(root, parser.keybindings, parser.mod_key)
             root.mainloop()
         except Exception as e:
             print(f"Error starting GUI: {e}. Falling back to CLI mode.", file=sys.stderr)
             parser.display_keybindings()
     else:
+        # Also update CLI output to show actual mod key
+        print(f"\033[1;32mNOTE\033[0m: 'Mod' refers to {parser.mod_key}")
         parser.display_keybindings()
