@@ -55,31 +55,109 @@ class KeybindingParser:
         
         try:
             with open(file_path, 'r') as f:
-                lines = f.readlines()
+                content = f.read()
+            
+            # Process includes first
+            include_pattern = re.compile(r'include\s+"([^"]+)"')
+            for include_match in include_pattern.finditer(content):
+                include_path = include_match.group(1)
+                if not Path(include_path).is_absolute():
+                    include_path = self.config_dir / include_path
                 
-            # Extract includes and process them
-            for i, line in enumerate(lines):
-                if 'include' in line:
-                    include_match = re.search(r'include\s+"([^"]+)"', line)
-                    if include_match:
-                        include_path = include_match.group(1)
-                        if not Path(include_path).is_absolute():
-                            include_path = self.config_dir / include_path
-                        
-                        # Determine category from filename
-                        cat_name = Path(include_path).stem.capitalize()
-                        self.categories[str(include_path)] = cat_name
-                        
-                        self.parse_file(include_path, cat_name)
+                # Determine category from filename
+                cat_name = Path(include_path).stem.capitalize()
+                self.categories[str(include_path)] = cat_name
+                
+                self.parse_file(include_path, cat_name)
             
-            # Extract bindsym definitions with preceding comments
+            # Extract mode definitions and nested bindsym definitions
+            mode_pattern = re.compile(r'set\s+\$(\w+)\s+(.+)|mode\s+"(\$[^"]+)"\s*{([^}]+)}', re.DOTALL)
+            mode_vars = {}
+            
+            # Find mode variable definitions
+            for mode_match in re.finditer(r'set\s+\$(\w+)\s+(.+)', content):
+                var_name, var_value = mode_match.groups()
+                mode_vars[f"${var_name}"] = var_value.strip().strip('"')
+            
+            # Find mode blocks with bindings
+            mode_blocks = re.finditer(r'mode\s+"(\$[^"]+|[^"]+)"\s*{([^}]+)}', content) # Fixed to catch all mode blocks
+            for mode_block in mode_blocks:
+                mode_name, mode_content = mode_block.groups()
+                # Resolve mode variable to its description
+                mode_desc = mode_vars.get(mode_name, mode_name)
+                
+                # Find the key combination that activates this mode
+                mode_activator = self.find_mode_activator(content, mode_name)
+                
+                # Now parse bindings inside this mode
+                prev_line = ""
+                for line in mode_content.split('\n'):
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        prev_line = line
+                        continue
+                        
+                    bindsym_match = re.search(r'bindsym\s+(\S+)\s+(.+?)(?:\s*#\s*(.+))?$', line)
+                    if bindsym_match:
+                        key_combo, command, inline_comment = bindsym_match.groups()
+                        command = command.strip()
+                        
+                        # Check if previous line was a comment (description)
+                        if prev_line.strip().startswith('#'):
+                            description = prev_line.strip()[1:].strip()
+                        else:
+                            description = inline_comment if inline_comment else command
+                        
+                        # Form the hierarchical key combo: mod+key > mode_key
+                        full_key_combo = f"{mode_activator} > {key_combo}" if mode_activator else key_combo
+                        
+                        # Store the binding with the special mode category
+                        actual_category = category if category else Path(file_path).stem.capitalize()
+                        
+                        # Set is_mode to True for all bindings within a mode block
+                        is_mode = True
+                        
+                        # Check if this is another mode activation
+                        if "mode" in command and re.search(r'mode\s+"(\$[^"]+|[^"]+)"', command):
+                            # This is a submenu mode activation
+                            self.keybindings[actual_category].append({
+                                'key': full_key_combo,
+                                'command': command,
+                                'description': f"Enter {description} mode",
+                                'is_mode': True,
+                                'mode_name': command.strip().strip('"'),
+                                'is_submenu': True  # Mark as submenu for special styling
+                            })
+                        else:
+                            self.keybindings[actual_category].append({
+                                'key': full_key_combo,
+                                'command': command,
+                                'description': description,
+                                'is_mode': True,  # Mark all bindings in a mode block
+                                'is_action': True  # This is an action within a mode
+                            })
+                    
+                    prev_line = line
+            
+            # Process normal bindsym definitions (outside of modes)
+            lines = content.split('\n')
             prev_line = ""
-            prev_description = None
+            mode_section = False
             
             for i, line in enumerate(lines):
-                # Check if the current line is a bindsym definition
+                # Skip lines inside mode blocks
+                if '{' in line and 'mode' in line:
+                    mode_section = True
+                    continue
+                if mode_section and '}' in line:
+                    mode_section = False
+                    continue
+                if mode_section:
+                    continue
+                
+                # Process regular bindsym lines
                 if 'bindsym' in line:
-                    bindsym_match = re.search(r'bindsym\s+(\$\w+\+\S+)\s+(.+?)(?:\s*#\s*(.+))?$', line)
+                    bindsym_match = re.search(r'bindsym\s+(\$\w+\+\S+|\S+)\s+(.+?)(?:\s*#\s*(.+))?$', line)
                     
                     if bindsym_match:
                         key_combo, command, inline_comment = bindsym_match.groups()
@@ -100,17 +178,38 @@ class KeybindingParser:
                         if actual_category is None:
                             actual_category = Path(file_path).stem.capitalize()
                         
-                        self.keybindings[actual_category].append({
-                            'key': key_combo,
-                            'command': command,
-                            'description': description
-                        })
+                        # Check if this activates a mode
+                        if "mode" in command and "$mode_" in command:
+                            mode_name = command.strip().strip('"')
+                            mode_desc = mode_vars.get(mode_name, mode_name)
+                            
+                            self.keybindings[actual_category].append({
+                                'key': key_combo,
+                                'command': command,
+                                'description': f"Enter {mode_desc}",
+                                'is_mode': True,
+                                'mode_name': mode_name
+                            })
+                        else:
+                            self.keybindings[actual_category].append({
+                                'key': key_combo,
+                                'command': command,
+                                'description': description,
+                                'is_mode': False
+                            })
                 
                 # Save the current line for the next iteration
                 prev_line = line
                 
         except Exception as e:
             print(f"Error parsing {file_path}: {e}", file=sys.stderr)
+        
+    def find_mode_activator(self, content, mode_name):
+        """Find the key binding that activates a specific mode."""
+        activator_match = re.search(r'bindsym\s+(\$\w+\+\S+|\S+)\s+mode\s+"' + re.escape(mode_name) + '"', content)
+        if activator_match:
+            return activator_match.group(1)
+        return None
 
     def parse_config(self):
         """Parse the main config and all included files."""
@@ -145,16 +244,22 @@ class KeybindingParser:
                 key = binding['key'].replace('$mod', 'Mod')
                 description = binding['description'] if binding['description'] else binding['command']
                 
-                # Truncate long descriptions
-                if len(description) > 60:
-                    description = description[:57] + "..."
+                # Highlight mode activations
+                if binding.get('is_mode', False):
+                    key_format = "\033[1;35m{:<30}\033[0m"  # Purple for mode keys
+                else:
+                    key_format = "\033[1;33m{:<30}\033[0m"  # Yellow for regular keys
                 
-                print(f"\033[1;33m{key:<20}\033[0m │ \033[0;37m{description}\033[0m")
+                # Truncate long descriptions
+                if len(description) > 50:
+                    description = description[:47] + "..."
+                
+                print(f"{key_format.format(key)} │ \033[0;37m{description}\033[0m")
             
             print("")
         
         # Show mod key meaning
-        print("\033[1;32mNOTE\033[0m: 'Mod' refers to your configured modifier key (Alt or Windows key)")
+        print(f"\033[1;32mNOTE\033[0m: 'Mod' refers to {self.mod_key}")
 
 
 class KeybindingsGUI:
@@ -200,8 +305,8 @@ class KeybindingsGUI:
             self.tree.heading(col, text=col, anchor=tk.W)
         
         # Set column widths
-        self.tree.column("Key", width=150, minwidth=100)
-        self.tree.column("Description", width=350, minwidth=200)
+        self.tree.column("Key", width=200, minwidth=150)  # Made wider for hierarchical keys
+        self.tree.column("Description", width=300, minwidth=200)
         self.tree.column("Command", width=250, minwidth=150)
         self.tree.column("Category", width=120, minwidth=100)
         
@@ -221,12 +326,15 @@ class KeybindingsGUI:
         status_bar.pack(side=tk.BOTTOM, fill=tk.X)
         
         # Set note about mod key
-        self.status_var.set("NOTE: 'Mod' refers to your configured modifier key (Alt or Windows key)")
+        self.status_var.set(f"NOTE: 'Mod' refers to {self.mod_key}")
         
-        # Create a custom style with alternating row colors
+        # Create custom styles for the treeview
         style = ttk.Style()
         style.map('Treeview', background=[('selected', '#3584e4')])
         style.configure("Treeview", font=('Monospace', 10))
+        
+        # Mode binding style tag
+        self.tree.tag_configure('mode', foreground='#9141ac')  # Purple for mode keys
 
     def populate_data(self):
         # Collect categories for filter dropdown
@@ -241,17 +349,21 @@ class KeybindingsGUI:
                 key = binding['key'].replace('$mod', 'Mod')
                 description = binding['description']
                 command = binding['command']
+                is_mode = binding.get('is_mode', False)
                 
                 # Store all bindings for filtering
                 self.all_bindings.append({
                     'key': key,
                     'description': description,
                     'command': command,
-                    'category': category
+                    'category': category,
+                    'is_mode': is_mode
                 })
                 
-                # Add to treeview
-                self.tree.insert("", tk.END, values=(key, description, command, category))
+                # Add to treeview with appropriate tags
+                item_id = self.tree.insert("", tk.END, values=(key, description, command, category))
+                if is_mode:
+                    self.tree.item(item_id, tags=('mode',))
         
         # Update category combobox
         self.category_combo['values'] = sorted(categories)
@@ -275,6 +387,7 @@ class KeybindingsGUI:
             description = binding['description']
             command = binding['command']
             bind_category = binding['category']
+            is_mode = binding.get('is_mode', False)
             
             # Apply filters
             if category != "All" and category != bind_category:
@@ -283,8 +396,10 @@ class KeybindingsGUI:
             if search_text and search_text not in key.lower() and search_text not in description.lower() and search_text not in command.lower():
                 continue
                 
-            # Add matching binding to treeview
-            self.tree.insert("", tk.END, values=(key, description, command, bind_category))
+            # Add matching binding to treeview with appropriate tags
+            item_id = self.tree.insert("", tk.END, values=(key, description, command, bind_category))
+            if is_mode:
+                self.tree.item(item_id, tags=('mode',))
             count += 1
             
         # Update status with count
@@ -311,6 +426,4 @@ if __name__ == "__main__":
             print(f"Error starting GUI: {e}. Falling back to CLI mode.", file=sys.stderr)
             parser.display_keybindings()
     else:
-        # Also update CLI output to show actual mod key
-        print(f"\033[1;32mNOTE\033[0m: 'Mod' refers to {parser.mod_key}")
         parser.display_keybindings()
