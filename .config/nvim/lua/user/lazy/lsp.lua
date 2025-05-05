@@ -11,7 +11,7 @@ return {
     "L3MON4D3/LuaSnip",
     "saadparwaiz1/cmp_luasnip",
     "j-hui/fidget.nvim",
-
+ 
     config=function()
         local lsp = require("lsp-zero")
         lsp.preset("recommended")
@@ -38,3 +38,4 @@ return {
         lsp.setup()
     end
 }
+
