@@ -47,14 +47,5 @@ floating_modifier $mod
 # or left-clicking anywhere into the window while holding the floating modifier.
 tiling_drag modifier titlebar
 
-include "./workspaces.conf"
-
-include "./volume-control.conf"
-
-include "./keybindings.conf"
-
-include "./resize.conf"
-
-include "./bar.conf"
-
-include "./background.conf"
+include "./settings/config"
+include "./keybindings/config"

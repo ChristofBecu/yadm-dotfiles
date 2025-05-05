@@ -260,7 +260,7 @@ if __name__ == "__main__":
     # Check command line arguments to decide if we should use GUI or CLI
     use_gui = "--cli" not in sys.argv
     
-    parser = KeybindingParser('/home/bedawang/.config/i3')
+    parser = KeybindingParser('/home/bedawang/.config/i3/keybindings')
     parser.parse_config()
     
     if use_gui:
