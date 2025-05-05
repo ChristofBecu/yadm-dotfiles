@@ -131,7 +131,7 @@ log_updates() {
 echo "Step 1: Updating package databases and upgrading packages..."
 # Create a temporary file to store pacman output
 PACMAN_OUTPUT=$(mktemp)
-sudo pacman -Syu --noconfirm 2>&1 | tee "$PACMAN_OUTPUT"
+sudo pacman -Syuv --noconfirm 2>&1 | tee "$PACMAN_OUTPUT"
 
 # Log pacman updates
 echo "Logging pacman updates..." >> "$LOG_FILE"
@@ -140,14 +140,14 @@ rm -f "$PACMAN_OUTPUT"
 
 # Clean the package cache to free up disk space
 echo "Step 2: Cleaning package cache..."
-sudo pacman -Sc --noconfirm
+sudo pacman -Scv --noconfirm
 
 # Update AUR packages if yay is installed
 if command -v yay &> /dev/null; then
     echo "Step 3: Updating AUR packages using yay..."
     # Create a temporary file to store yay output
     YAY_OUTPUT=$(mktemp)
-    yay -Sua --noconfirm 2>&1 | tee "$YAY_OUTPUT"
+    yay -Suav --noconfirm 2>&1 | tee "$YAY_OUTPUT"
     
     # Log yay updates
     echo "Logging yay updates..." >> "$LOG_FILE"
