@@ -65,6 +65,12 @@ vimbegood.lua
 .config/scummvm/
 .npm/
 .python_history
-.config/nomacs/*
+.config/nomacs/
 ".config/nomacs/Image Lounge.conf"
 .config/nomacs/Image\ Lounge.conf
+.vscode-insiders/
+.config/Code\ -\ Insiders/
+.config/ai
+scripts/ai-test.sh
+scripts/ai.sh
+
