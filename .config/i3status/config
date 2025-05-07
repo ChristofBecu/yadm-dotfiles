@@ -4,7 +4,7 @@ general {
         interval = 5
 }
 
-
+order += "read_file spotify"
 #order += "battery all"
 order += "disk /"
 order += "memory"
@@ -45,4 +45,9 @@ volume master {
         device = "default"
         mixer = "Master"
         mixer_idx = 0
+}
+
+read_file spotify {
+    format = "♪ %content"
+    path = "~/logs/spotify.log"
 }

@@ -1,4 +1,7 @@
+include "./workspaces.conf"
+include "./autostart.conf"
 include "./volume-control.conf"
 include "./bar.conf"
 include "./background.conf"
 include "./gaps.conf"
+include "./dunst.conf"
