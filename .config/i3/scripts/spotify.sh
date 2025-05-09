@@ -1,4 +1,23 @@
 #!/bin/bash
-title=`dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'Metadata'|grep -A 1 "title"|cut -b 44-|cut -d '"' -f 1|grep -v ^$`
-artist=`dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'Metadata'|grep -A 2 "artist"|cut -b 20-|cut -d '"' -f 2|grep -v ^$|grep -v array|grep -v artist`
-echo $artist '|' $title
+
+get_spotify_metadata() {
+    gdbus call --session \
+        --dest org.mpris.MediaPlayer2.spotify \
+        --object-path /org/mpris/MediaPlayer2 \
+        --method org.freedesktop.DBus.Properties.Get \
+        org.mpris.MediaPlayer2.Player Metadata
+        
+}
+
+get_spotify_title() {
+    get_spotify_metadata | jq -r '.[1]["xesam:title"]'
+}
+
+get_spotify_artist() {
+    get_spotify_metadata | jq -r '.[1]["xesam:artist"][0]'
+}
+
+# Example usage:
+title=$(get_spotify_title)
+artist=$(get_spotify_artist)
+echo "Now playing: $title by $artist"

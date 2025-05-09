@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-/usr/bin/spotifycli --statusshort > ~/logs/spotify.log
+/usr/bin/spotifycli --status > ~/logs/spotify.log
