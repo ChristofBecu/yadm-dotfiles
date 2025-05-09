@@ -367,7 +367,7 @@
 [spotify]
     appname = Spotify
     urgency = normal
-    script  = ~/scripts/spotify_log.sh
+    script  = ~/.config/i3/scripts/spotify_log.sh
 
 
 # Every section that isn't one of the above is interpreted as a rules to
