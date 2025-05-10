@@ -1,7 +1,7 @@
 general {
         output_format= "i3bar"
         colors = true
-        interval = 5
+        interval = 1
 }
 
 order += "read_file spotify"
@@ -19,7 +19,6 @@ wireless _first_ {
 }
 
 battery all {
-
         format = "%status/%percentage/%remaining"
 }
 
@@ -48,9 +47,9 @@ volume master {
 }
 
 read_file spotify {
-    format = "♪ %content"
+    format = %content
     path = "~/logs/spotify.log"
     min_width = 200
-    align = left
-    separator_block_width = 5
+    align = right
+    separator_block_width = 20
 }

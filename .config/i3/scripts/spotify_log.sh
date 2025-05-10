@@ -14,4 +14,19 @@
 
 # i3status is reading the log file to display the current status of Spotify in the i3status bar.
 
-/usr/bin/spotifycli --status > ~/logs/spotify.log
+if ! pgrep -x "spotify" > /dev/null; then
+    # Spotify is not running
+    echo "   ✖ " > ~/logs/spotify.log
+    exit 0
+else
+    PLAYBACK_STATUS=$(spotifycli --playbackstatus 2>/dev/null)
+    TRACK_INFO="$(/usr/bin/spotifycli --status)"
+
+    if [ "$PLAYBACK_STATUS" = "▶" ]; then
+        PLAYBACK_STATUS="   ▶ "
+    elif [ "$PLAYBACK_STATUS" = "▮▮" ]; then
+        PLAYBACK_STATUS="  ▮▮ "
+    fi
+
+    echo "${TRACK_INFO} ${PLAYBACK_STATUS}" > ~/logs/spotify.log
+fi
