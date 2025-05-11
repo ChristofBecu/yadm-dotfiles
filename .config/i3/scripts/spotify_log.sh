@@ -20,7 +20,7 @@ if ! pgrep -x "spotify" > /dev/null; then
     exit 0
 else
     PLAYBACK_STATUS=$(spotifycli --playbackstatus 2>/dev/null)
-    TRACK_INFO="$(/usr/bin/spotifycli --status)"
+    TRACK_INFO="$(/usr/bin/spotifycli --status) ($(/usr/bin/spotifycli --album))"
 
     if [ "$PLAYBACK_STATUS" = "▶" ]; then
         PLAYBACK_STATUS="   ▶ "
