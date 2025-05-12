@@ -275,6 +275,7 @@ class KeybindingsGUI:
         # Configure root window
         self.root.title("i3 Keybindings Viewer")
         self.root.geometry("900x600")
+        self.root.bind("<Escape>", lambda e: self.root.quit())
         
         # Add main frame
         main_frame = ttk.Frame(self.root, padding="10")
