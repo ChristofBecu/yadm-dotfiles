@@ -275,8 +275,14 @@ class KeybindingsGUI:
         # Configure root window
         self.root.title("i3 Keybindings Viewer")
         self.root.geometry("900x600")
+
+        # --- Global Keyboard Shortcuts ---
         self.root.bind("<Escape>", lambda e: self.root.quit())
-        
+        self.root.bind("<Control-q>", lambda e: self.root.quit())
+        self.root.bind("<Control-c>", lambda e: self.root.quit())
+        self.root.bind("<Control-s>", self.focus_search)
+        self.root.bind("<Control-c>", self.focus_category)
+
         # Add main frame
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.pack(expand=True, fill=tk.BOTH)
@@ -315,6 +321,12 @@ class KeybindingsGUI:
         vsb = ttk.Scrollbar(main_frame, orient="vertical", command=self.tree.yview)
         hsb = ttk.Scrollbar(main_frame, orient="horizontal", command=self.tree.xview)
         self.tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+
+        # --- Treeview Keyboard Navigation ---
+        self.tree.bind("j", lambda e: self.move_selection(1))
+        self.tree.bind("<Down>", lambda e: self.move_selection(1))
+        self.tree.bind("k", lambda e: self.move_selection(-1))
+        self.tree.bind("<Up>", lambda e: self.move_selection(-1))
         
         # Grid the treeview and scrollbars
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -336,6 +348,9 @@ class KeybindingsGUI:
         
         # Mode binding style tag
         self.tree.tag_configure('mode', foreground='#9141ac')  # Purple for mode keys
+
+        # Set initial focus on the search entry for immediate typing
+        self.search_entry.focus_set()
 
     def populate_data(self):
         # Collect categories for filter dropdown
@@ -409,6 +424,38 @@ class KeybindingsGUI:
         else:
             plural = "s" if count != 1 else ""
             self.status_var.set(f"Showing {count} keybinding{plural}. NOTE: 'Mod' refers to {self.mod_key}")
+
+        # After filtering, select the first item if any exist
+        children = self.tree.get_children()
+        if children:
+            self.tree.focus(children[0])
+            self.tree.selection_set(children[0])
+
+    def focus_search(self, event=None):
+        """Move keyboard focus to the search entry."""
+        self.search_entry.focus_set()
+        self.search_entry.select_range(0, tk.END)
+
+    def focus_category(self, event=None):
+        """Move keyboard focus to the category combobox."""
+        self.category_combo.focus_set()
+        self.category_combo.current(0)
+        return "break"  # Prevents default binding from firing
+
+    def move_selection(self, delta):
+        """Move the selection in the treeview by a given delta."""
+        current_focus = self.tree.focus()
+        if not current_focus:
+            return
+
+        next_item = self.tree.next(current_focus) if delta > 0 else self.tree.prev(current_focus)
+        
+        if next_item:
+            self.tree.selection_set(next_item)
+            self.tree.focus(next_item)
+            self.tree.see(next_item) # Ensure the new item is visible
+        
+        return "break" # Prevents default binding from firing
 
 
 if __name__ == "__main__":
