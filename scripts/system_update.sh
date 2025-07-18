@@ -103,7 +103,7 @@ log_updates() {
     
     # Parse the pacman/yay output and log updates
     while IFS= read -r line; do
-        if [[ $line =~ ([a-zA-Z0-9_\-\.]+)\ \(([0-9\.a-z\-]+)\ \-\>\ ([0-9\.a-z\-]+)\) ]]; then
+        if [[ $line =~ ([a-zA-Z0-9_.-]+)\ \(([0-9a-z.-]+)\ \-\>\ ([0-9a-z.-]+)\) ]]; then
             package_name="${BASH_REMATCH[1]}"
             old_version="${BASH_REMATCH[2]}"
             new_version="${BASH_REMATCH[3]}"
