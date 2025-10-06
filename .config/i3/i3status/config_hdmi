@@ -4,6 +4,7 @@ general {
         interval = 1
 }
 
+order += "read_file clipboard"
 order += "read_file spotify"
 #order += "battery all"
 #order += "disk /"
@@ -25,8 +26,6 @@ battery all {
 disk "/" {
         format = "💾 %free"
 }
-
-
 
 memory {
         format = "📈 %used 🧠 %total"
@@ -52,4 +51,12 @@ read_file spotify {
     min_width = 200
     align = right
     separator_block_width = 20
+}
+
+read_file clipboard {
+        format = %content
+        path = "/tmp/clipboard_status"
+        min_width = 50
+        align = center
+        separator_block_width = 30
 }
