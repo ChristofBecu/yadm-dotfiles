@@ -24,3 +24,5 @@ source ~/sources/forgit/forgit.plugin.sh
 . "$HOME/.cargo/env"
 
 export PATH="$HOME/.dotnet:$PATH"
+
+source /home/bedawang/.config/broot/launcher/bash/br

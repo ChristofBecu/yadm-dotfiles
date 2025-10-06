@@ -11,3 +11,5 @@ if [ "$(tty)" == "/dev/tty1" ]; then
 fi
 
 . "$HOME/.cargo/env"
+
+source /home/bedawang/.config/broot/launcher/bash/br
