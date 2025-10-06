@@ -1,4 +1,16 @@
 function fish_right_prompt
+    # Disable git status in Linux kernel directory
+    set -l current_dir (pwd)
+    if string match -q "/home/bedawang/dev/kernel/linux*" "$current_dir"
+        set -l cmd_status $status
+        if test $cmd_status -ne 0
+            echo -n (set_color red)"✘ $cmd_status"
+        end
+        echo -n (set_color yellow)" [linux kernel]"
+        set_color normal
+        return
+    end
+
     set -l cmd_status $status
     if test $cmd_status -ne 0
         echo -n (set_color red)"✘ $cmd_status"
