@@ -25,5 +25,8 @@ floating_modifier $mod
 # or left-clicking anywhere into the window while holding the floating modifier.
 tiling_drag modifier titlebar
 
+# Fix DPI for consistent geometry
+exec_always --no-startup-id xrandr --dpi 96
+
 include "./settings/config"
 include "./keybindings/config"
