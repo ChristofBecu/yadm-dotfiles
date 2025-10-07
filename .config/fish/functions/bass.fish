@@ -1,3 +1,7 @@
+# Bass - Makes Bash utilities usable in Fish shell
+# This function allows you to source Bash scripts and import their environment changes into Fish
+# Usage: bass [-d] <bash-command>
+# Example: bass source ~/.bashrc
 function bass
   set -l bash_args $argv
   set -l bass_debug
