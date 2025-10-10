@@ -1,9 +1,17 @@
 #!/bin/bash
-# filepath: /home/bedawang/.config/i3/scripts/i3status-clipboard.sh
+# filepath: ~/.config/i3/scripts/i3status-clipboard.sh
 
 readonly STATUS_FILE="/tmp/clipboard_status"
 readonly MAX_LENGTH=40
 readonly SLEEP_INTERVAL=2
+
+previous_hash=""
+
+clipboard_changed() {
+    local current_hash=$(xclip -o -selection clipboard 2>/dev/null | md5sum)
+    [[ "$current_hash" != "$previous_hash" ]] && previous_hash="$current_hash" && return 0
+    return 1
+}
 
 get_clipboard_status() {
     local targets=$(xclip -selection clipboard -t TARGETS -o 2>/dev/null)
@@ -21,4 +29,7 @@ get_clipboard_status() {
     esac
 }
 
-while get_clipboard_status > "$STATUS_FILE"; do sleep "$SLEEP_INTERVAL"; done
+while true; do
+    clipboard_changed && get_clipboard_status > "$STATUS_FILE"
+    sleep "$SLEEP_INTERVAL"
+done
