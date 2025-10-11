@@ -131,7 +131,9 @@ log_updates() {
 echo "Step 1: Updating package databases and upgrading packages..."
 # Create a temporary file to store pacman output
 PACMAN_OUTPUT=$(mktemp)
-sudo pacman -Syuv --noconfirm 2>&1 | tee "$PACMAN_OUTPUT"
+if ! timeout 300 sudo pacman -Syuv --noconfirm 2>&1 | tee "$PACMAN_OUTPUT"; then
+  echo "⚠️  Pacman update skipped due to timeout."
+fi
 
 # Log pacman updates
 echo "Logging pacman updates..." >> "$LOG_FILE"
@@ -140,6 +142,7 @@ rm -f "$PACMAN_OUTPUT"
 
 # Clean the package cache to free up disk space
 echo "Step 2: Cleaning package cache..."
+sudo rm -f /var/cache/pacman/pkg/download-* 2>/dev/null
 sudo pacman -Scv --noconfirm
 
 # Update AUR packages if yay is installed
