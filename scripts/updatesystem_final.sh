@@ -299,6 +299,8 @@ generate_summary() {
             IFS='|' read -r pkg old_ver new_ver manager <<< "$update"
             log "$(printf '%-30s | %-20s | %-20s | %s' "$pkg" "$old_ver" "$new_ver" "$manager")"
         done
+    else
+        log "\n📋 No packages were updated during this session."
     fi
     
     if (( ${#CRITICAL_UPDATES[@]} > 0 )); then
