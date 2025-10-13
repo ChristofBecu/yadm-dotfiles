@@ -1,0 +1,4 @@
+[ai]
+# A global switch to enable or disable all AI-powered functionality
+enabled = true
+
