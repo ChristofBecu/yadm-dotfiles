@@ -1,5 +1,7 @@
 # This file contains fish universal variable definitions.
 # VERSION: 3.0
+SETUVAR --export DOTNET_ROOT:/home/bedawang/\x2edotnet
+SETUVAR --export --path PATH:/home/bedawang/\x2edotnet/\x1e/home/bedawang/\x2elocal/share/intelli\x2dshell/bin\x1e/home/bedawang/\x2epyenv/bin\x1e/usr/local/sbin\x1e/usr/local/bin\x1e/usr/bin\x1e/home/bedawang/\x2ecargo/bin\x1e/home/bedawang/scripts\x1e/home/bedawang/\x2elocal/share/nvm/v22\x2e14\x2e0/bin/\x1e/home/bedawang/bin/\x1e/home/bedawang/\x2edotnet\x1e/home/bedawang/\x2edotnet/tools\x1e/home/bedawang/\x2elocal/bin\x1e/home/bedawang/\x2elocal/share/nvm/v22\x2e14\x2e0/lib/node_modules/\x40angular/cli/bin\x1e/home/bedawang/dev/external/vcpkg\x1e/home/bedawang/go/bin\x1e/usr/bin/site_perl\x1e/usr/bin/vendor_perl\x1e/usr/bin/core_perl\x1e/home/bedawang/\x2ecargo/bin\x1e/home/bedawang/scripts\x1e/home/bedawang/\x2elocal/share/nvm/v22\x2e14\x2e0/bin/\x1e/home/bedawang/bin/\x1e/home/bedawang/\x2edotnet\x1e/home/bedawang/\x2edotnet/tools\x1e/home/bedawang/\x2elocal/bin\x1e/home/bedawang/\x2elocal/share/nvm/v22\x2e14\x2e0/lib/node_modules/\x40angular/cli/bin\x1e/home/bedawang/dev/external/vcpkg\x1e/home/bedawang/go/bin
 SETUVAR --export PYENV_ROOT:/home/bedawang/\x2epyenv
 SETUVAR __fish_git_prompt_show_informative_status:0
 SETUVAR __fish_initialized:3800
@@ -46,4 +48,4 @@ SETUVAR fish_pager_color_selected_background:\x2d\x2dbackground\x3dFF9940
 SETUVAR fish_pager_color_selected_completion:\x1d
 SETUVAR fish_pager_color_selected_description:\x1d
 SETUVAR fish_pager_color_selected_prefix:\x1d
-SETUVAR fish_user_paths:/home/bedawang/\x2elocal/share/intelli\x2dshell/bin\x1e/home/bedawang/\x2epyenv/bin
+SETUVAR fish_user_paths:/home/bedawang/\x2edotnet\x1e/home/bedawang/\x2elocal/share/intelli\x2dshell/bin\x1e/home/bedawang/\x2epyenv/bin
