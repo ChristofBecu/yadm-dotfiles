@@ -5,7 +5,7 @@ general {
 }
 
 order += "read_file clipboard"
-order += "read_file spotify"
+order += "read_file mocp"
 #order += "battery all"
 #order += "disk /"
 #order += "memory"
@@ -45,10 +45,10 @@ volume master {
         mixer_idx = 0
 }
 
-read_file spotify {
+read_file mocp {
     format = %content
-    path = "~/logs/spotify.log"
-    min_width = 200
+    path = "~/logs/mocp.log"
+    min_width = 50
     align = right
     separator_block_width = 20
 }
