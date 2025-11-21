@@ -1,0 +1,51 @@
+@startuml Arch Update Script
+!theme spacelab
+
+title Arch Update Script - Modular Architecture & Flow
+
+actor User
+User -> "bin/updatesystem.sh": Run script
+
+"bin/updatesystem.sh" -> "lib/config.sh": Source config
+"bin/updatesystem.sh" -> "lib/logging.sh": Source logging
+"bin/updatesystem.sh" -> "lib/utils.sh": Source utils
+"bin/updatesystem.sh" -> "lib/mirrors.sh": Source mirrors
+"bin/updatesystem.sh" -> "lib/pacman.sh": Source pacman
+"bin/updatesystem.sh" -> "lib/aur.sh": Source aur
+"bin/updatesystem.sh" -> "lib/cache.sh": Source cache
+"bin/updatesystem.sh" -> "lib/system_health.sh": Source system_health
+
+"bin/updatesystem.sh" -> "lib/logging.sh": log session start
+
+"bin/updatesystem.sh" -> "lib/mirrors.sh": refresh_mirrors()
+"lib/mirrors.sh" -> "lib/logging.sh": log step
+"lib/mirrors.sh" -> "lib/mirrors.sh": should_update_mirrors()
+
+"bin/updatesystem.sh" -> "lib/pacman.sh": update_pacman()
+"lib/pacman.sh" -> "lib/logging.sh": log step
+"lib/pacman.sh" -> "lib/utils.sh": handle_pacman_lock(), get_installed_version()
+"lib/pacman.sh" -> "lib/pacman.sh": parse_package_list(), process_upgrade_actions()
+"lib/pacman.sh" -> "lib/logging.sh": log_updates()
+"lib/pacman.sh" -> "lib/utils.sh": track_critical_package()
+
+"bin/updatesystem.sh" -> "lib/cache.sh": clean_cache()
+"lib/cache.sh" -> "lib/logging.sh": log step
+
+"bin/updatesystem.sh" -> "lib/aur.sh": update_aur()
+"lib/aur.sh" -> "lib/logging.sh": log step
+"lib/aur.sh" -> "lib/pacman.sh": log_updates() (for AUR)
+
+"bin/updatesystem.sh" -> "lib/system_health.sh": check_failed_services()
+"lib/system_health.sh" -> "lib/logging.sh": log step
+
+"bin/updatesystem.sh" -> "lib/system_health.sh": check_journal_errors()
+"lib/system_health.sh" -> "lib/logging.sh": log step
+
+"bin/updatesystem.sh" -> "lib/system_health.sh": generate_summary()
+"lib/system_health.sh" -> "lib/logging.sh": log summary
+
+"bin/updatesystem.sh" -> "lib/utils.sh": cleanup()
+
+User <- "bin/updatesystem.sh": See summary & logs
+
+@enduml
