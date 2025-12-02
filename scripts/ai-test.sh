@@ -4,7 +4,7 @@
 #DEFAULT_MODEL="qwen-2.5-coder-32b"
 GROQ_API_URL="https://openrouter.ai/api/v1"
 DEFAULT_MODEL="gpt-3.5-turbo"
-GROQ_API_KEY="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" # Vervang dit door je eigen API-key
+GROQ_API_KEY="" # Vervang dit door je eigen API-key
 
 # Controleer of de API-key is ingesteld
 if [ -z "$GROQ_API_KEY" ]; then
